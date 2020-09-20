@@ -123,8 +123,4 @@ public class Entry {
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
-	
-
 }

@@ -52,8 +52,4 @@ public class EntryTotal {
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
-	
-
 }

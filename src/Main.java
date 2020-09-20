@@ -1,10 +1,8 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,21 +30,16 @@ class Main {
     	char play = 'Y';
     	
     	ArrayList<String> playerList = new ArrayList<>();
-    	ArrayList<String> playerListTotal = new ArrayList<>();
     	ArrayList<Entry>  entries = new ArrayList<>();
     	ArrayList<EntryTotal>  entryTotals = new ArrayList<>();
-
     	
     	System.out.println("Initializing: Loading PlayerNames Data ");
     	playerList = readFile();
     	entryTotals = readInputFile2();
     	System.out.println("Initializing complete: Loading Data completed successfully");
     	
-    	
-    	
         // Create a Scanner Object
-        Scanner input = new Scanner(System.in);
-        
+        Scanner input = new Scanner(System.in);        
 
         while (play=='Y') {
         	round = round++;
@@ -64,7 +57,6 @@ class Main {
 		        	}
 		        
 		        if (playerExits) {
-		        	
 		        	System.out.print("Enter your bet. Either number, EVEN or ODD: ");
 		            String bet = input.next();
 		            if(bet.equalsIgnoreCase("even")) {
@@ -86,17 +78,14 @@ class Main {
 		            	entry = new Entry (name, num, ammount);
 		            }
 		            
-		            
 		            // Place the bet for this entry
 		            entries = placeBet(entries, entry);
-		            
 		            
 		        } else {
 		        	System.out.println( " Sorry player with name: " + name + " does not exist.");
 		        }
 		        
 		        System.out.print("Do you want to continue? Y/N");
-		        
 		        String answer = input.next();
 		        
 		        if(answer.length()>0) {
@@ -107,18 +96,15 @@ class Main {
 			        } else if (playAgain=='Y'){
 			           continue;
 			        }
-		        } else {
-		        }
-
-		        
+		        } 
 	        }
         	
         	System.out.println("Do you want to end this round? Y/N");
-	        
 	        String roundAnswer = input.next();
 	        if(roundAnswer.length()>0) {
 	        	char endRound = roundAnswer.charAt(0);
 	        	if (endRound=='Y') {
+	        		
 	        		// Play all bets for this round
 	        		entries = playBet(entries);
 	        		
@@ -136,16 +122,10 @@ class Main {
 	        } else {
 	        }
 	        
-        	
-        
         }
-
-        
         
         // Closes the scanner
         input.close();
-    	
-    	
     }
 
 	public static ArrayList<String> readFile() {
@@ -191,10 +171,8 @@ class Main {
 	
     
     
-    public static ArrayList<Entry> placeBet(ArrayList<Entry> entries,Entry entry) {
+    public static ArrayList<Entry> placeBet(ArrayList<Entry> entries, Entry entry) {
     	entries.add(entry);
-    	
-    	
 		return entries;
     }
     
@@ -229,7 +207,6 @@ class Main {
     	}
     	
     	return entries;
-    	
     }
     
     public static int genRandomNumber() {
@@ -239,7 +216,6 @@ class Main {
         System.out.println("");
     	 System.out.println("Number: " + x);
     	return x;
-    	
     }
     
     public static void printResults(String format,String format2, String heading11, String heading12, String heading13, String heading14, String heading21, String heading22, ArrayList<String> playerList, ArrayList<Entry> entries, ArrayList<EntryTotal>  entryTotalsList) {  	
@@ -283,7 +259,6 @@ class Main {
         	double winTotal = entryTotalsList.stream().filter(s -> s.getName().equals(playerNamee)).mapToDouble(w -> w.getTotalWin()).sum();
         	entryTotalT.setTotalBet(betTotal);
         	entryTotalT.setTotalWin(winTotal);
-        	
         	entryTotalsListVariable.add(entryTotalT);
         }
         
@@ -296,19 +271,13 @@ class Main {
         }
         System.out.println("");
         System.out.println("");
-        //
     }
     
     
     public static <T> Predicate<T> distinctByKey(
     	    Function<? super T, ?> keyExtractor) {
-    	  
     	    Map<Object, Boolean> seen = new ConcurrentHashMap<>(); 
     	    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null; 
     	}
-
-   
-    
-    
     
 }
