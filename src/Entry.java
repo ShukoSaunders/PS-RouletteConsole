@@ -6,18 +6,20 @@ public class Entry {
 	private boolean even;
 	private boolean odd;
 	private double betAmmount;
-	private boolean win;
+	private Outcome outcome;
 	private double winAmmount;
+	private String betValue;
 
 	public Entry() {
 		
 	}
 	
-	public Entry(String name, int number,double betAmmount) {
+	public Entry(String name, int number, double betAmmount) {
 		super();
 		this.name = name;
 		this.number = number;
 		this.betAmmount = betAmmount;
+		this.betValue = Integer.toString(number);
 	}
 	
 	public Entry(String name, boolean even, double betAmmount) {
@@ -25,6 +27,7 @@ public class Entry {
 		this.name = name;
 		this.even = even;
 		this.betAmmount = betAmmount;
+		this.betValue = "EVEN";
 	}
 	
 	public Entry(String name, boolean odd, double betAmmount, String bet) {
@@ -32,6 +35,7 @@ public class Entry {
 		this.name = name;
 		this.odd = odd;
 		this.betAmmount = betAmmount;
+		this.betValue = "ODD";
 	}
 	
 	public String getName() {
@@ -65,12 +69,12 @@ public class Entry {
 		this.winAmmount = winAmmount;
 	}
 
-	public boolean isWin() {
-		return win;
+	public Outcome getOutcome() {
+		return outcome;
 	}
 
-	public void setWin(boolean win) {
-		this.win = win;
+	public void setOutcome(Outcome outcome) {
+		this.outcome = outcome;
 	}
 
 	public boolean isEven() {
@@ -89,6 +93,14 @@ public class Entry {
 		this.odd = odd;
 	}
 
+	public String getBetValue() {
+		return betValue;
+	}
+
+	public void setBetValue(String betValue) {
+		this.betValue = betValue;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -102,10 +114,12 @@ public class Entry {
 		builder.append(odd);
 		builder.append(", betAmmount=");
 		builder.append(betAmmount);
-		builder.append(", win=");
-		builder.append(win);
+		builder.append(", outcome=");
+		builder.append(outcome);
 		builder.append(", winAmmount=");
 		builder.append(winAmmount);
+		builder.append(", betValue=");
+		builder.append(betValue);
 		builder.append("]");
 		return builder.toString();
 	}
