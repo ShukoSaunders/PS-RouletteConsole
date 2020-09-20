@@ -1,17 +1,28 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 class Main {
     public static void main(String[] args) {
     	
     	String format = "%-40s%-40s%-40s%-40s%n";
-        String row1column1 = "Player";
-        String row1column2 = "Bet";
-        String row1column3 = "Outcome";
-        String row1column4 = "Winings";
+    	String format2 = "%-40s%-40s%-40s%n";
+        String heading11 = "Player";
+        String heading12 = "Bet";
+        String heading13 = "Outcome";
+        String heading14 = "Winings";
+        String heading21 = "Total Win";
+        String heading22 = "Total Bet";
     	boolean even = false;
     	boolean odd = false;
     	boolean playerExits = false;
@@ -21,11 +32,14 @@ class Main {
     	char play = 'Y';
     	
     	ArrayList<String> playerList = new ArrayList<>();
+    	ArrayList<String> playerListTotal = new ArrayList<>();
     	ArrayList<Entry>  entries = new ArrayList<>();
- 	
+    	ArrayList<EntryTotal>  entryTotals = new ArrayList<>();
+
     	
     	System.out.println("Initializing: Loading PlayerNames Data ");
     	playerList = readFile();
+    	entryTotals = readInputFile2();
     	System.out.println("Initializing complete: Loading Data completed successfully");
     	
     	
@@ -109,7 +123,7 @@ class Main {
 	        		entries = playBet(entries);
 	        		
 	        		//Print Results for this round
-		            printResults(format, row1column1, row1column2, row1column3, row1column4, playerList, entries);
+		            printResults(format, format2, heading11, heading12, heading13, heading14,heading21, heading22, playerList, entries, entryTotals);
 		            
 		            //Clear Bets and Entries
 		            entries.clear();
@@ -133,8 +147,8 @@ class Main {
     	
     	
     }
-    
-    public static ArrayList<String> readFile() {
+
+	public static ArrayList<String> readFile() {
     	ArrayList<String> nameList = new ArrayList<>();
     	try {
     	      File myObj = new File("PlayerNames.txt");
@@ -151,6 +165,30 @@ class Main {
     	}
 		return nameList;
     }
+	
+	 private static ArrayList<EntryTotal> readInputFile2() {
+		 ArrayList<EntryTotal> entryTotalList = new ArrayList<>();
+		 try {
+	   	      File myObj = new File("InputFile2.txt");
+	   	      Scanner myReader = new Scanner(myObj);
+	   	      
+	   	      while (myReader.hasNextLine()) {
+	   	        String lineEntry = myReader.nextLine();
+	   	        String [] entrylist = lineEntry.split(",");
+	   	        EntryTotal entryTotal = new EntryTotal(entrylist[0],Double.parseDouble(entrylist[1]), Double.parseDouble(entrylist[2]));
+	   	        entryTotalList.add(entryTotal);
+	   	      }
+	   	      
+	   	      myReader.close();
+   	      
+		  } catch (FileNotFoundException e) {
+		   	      System.out.println("An error occurred.");
+		   	      e.printStackTrace();
+		  }
+		 
+		 return entryTotalList;
+		}
+	
     
     
     public static ArrayList<Entry> placeBet(ArrayList<Entry> entries,Entry entry) {
@@ -204,20 +242,72 @@ class Main {
     	
     }
     
-    public static void printResults(String format, String row1column1, String row1column2, String row1column3, String row1column4, ArrayList<String> playerList, ArrayList<Entry> entries) {  	
-        System.out.printf(format, row1column1, row1column2, row1column3, row1column4);
+    public static void printResults(String format,String format2, String heading11, String heading12, String heading13, String heading14, String heading21, String heading22, ArrayList<String> playerList, ArrayList<Entry> entries, ArrayList<EntryTotal>  entryTotalsList) {  	
+    	System.out.println("---------------------Output1---------------------");
+    	System.out.printf(format, heading11, heading12, heading13, heading14);
         System.out.println("---");
         
+        int betCount = 0;
+        
+        
         for(String player: playerList) {
+        	EntryTotal entryTotal = new EntryTotal();
+        	String playerName = player;
+        	betCount = 0;
         	for (Entry entryCheck : entries){
 	        	  if (entryCheck.getName().contains(player)){
+	        		  betCount++;
 	        		  System.out.printf(format, player, entryCheck.getBetValue(), entryCheck.getOutcome(), entryCheck.getWinAmmount());
-	        	  } 
+	        	  }
+	        	  
 	        	}
+        	entryTotal.setName(player);
+  		  	entryTotal.setTotalBet(betCount);
+  		  	double sum = entries.stream().filter(s -> s.getName().equals(playerName)).filter(e -> e.getOutcome().equals(Outcome.WIN)).mapToDouble(w -> w.getWinAmmount()).sum();
+  		  	entryTotal.setTotalWin(sum);
+        	entryTotalsList.add(entryTotal);
+        }
+        
+        System.out.println("");
+        System.out.println("");
+        System.out.println("---------------------Output2---------------------");
+        System.out.printf(format2, heading11, heading21, heading22);
+        System.out.println("---");
+        ArrayList<EntryTotal>  entryTotalsListVariable = new ArrayList<>();
+        
+        for(EntryTotal entryTotale: entryTotalsList) {
+        	EntryTotal entryTotalT = new EntryTotal();
+        	String playerNamee = entryTotale.getName();
+        	entryTotalT.setName(playerNamee); 
+        	double betTotal = entryTotalsList.stream().filter(s -> s.getName().equals(playerNamee)).mapToDouble(w -> w.getTotalBet()).sum();
+        	double winTotal = entryTotalsList.stream().filter(s -> s.getName().equals(playerNamee)).mapToDouble(w -> w.getTotalWin()).sum();
+        	entryTotalT.setTotalBet(betTotal);
+        	entryTotalT.setTotalWin(winTotal);
+        	
+        	entryTotalsListVariable.add(entryTotalT);
+        }
+        
+        List<EntryTotal>  entryTotalsListPrint = entryTotalsListVariable.stream() 
+        		  .filter(distinctByKey(EntryTotal::getName)) 
+        		  .collect(Collectors.toList());
+        
+        for(EntryTotal entryTotale: entryTotalsListPrint) {
+        	System.out.printf(format2, entryTotale.getName(), entryTotale.getTotalWin(), entryTotale.getTotalBet());
         }
         System.out.println("");
         System.out.println("");
+        //
     }
+    
+    
+    public static <T> Predicate<T> distinctByKey(
+    	    Function<? super T, ?> keyExtractor) {
+    	  
+    	    Map<Object, Boolean> seen = new ConcurrentHashMap<>(); 
+    	    return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null; 
+    	}
+
+   
     
     
     
